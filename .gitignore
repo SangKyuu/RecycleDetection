@@ -6,8 +6,18 @@ __pycache__/
 # C extensions
 *.so
 
-# Datasets
+# Datasets and weights
 dataset/
+*.pth
+*.pkl
+*.npy
+*.ts
+*.png
+*.json
+*.diff
+
+model_ts*.txt
+#models/CenterNet2/output/
 
 # Distribution / packaging
 .Python
