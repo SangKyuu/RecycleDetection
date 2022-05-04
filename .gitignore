@@ -17,7 +17,7 @@ dataset/
 *.diff
 
 model_ts*.txt
-#models/CenterNet2/output/
+models/CenterNet2/output/
 
 # Distribution / packaging
 .Python
