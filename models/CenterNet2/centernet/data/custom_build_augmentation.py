@@ -41,10 +41,13 @@ def build_custom_augmentation(cfg, is_train):
         if is_train:
             scale = cfg.INPUT.SCALE_RANGE
             size = cfg.INPUT.TRAIN_SIZE
+            augmentation = [EfficientDetResizeCrop(size, scale), T.RandomBrightness(0.8, 1.8),
+                            T.RandomContrast(0.6, 1.3), ]
+
         else:
             scale = (1, 1)
             size = cfg.INPUT.TEST_SIZE
-        augmentation = [EfficientDetResizeCrop(size, scale)]
+            augmentation = [EfficientDetResizeCrop(size, scale),]
     else:
         assert 0, cfg.INPUT.CUSTOM_AUG
 

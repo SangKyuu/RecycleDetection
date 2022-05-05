@@ -35,7 +35,7 @@ def split_data(images_json, sorted_ann, n=5):
 
 if __name__ == '__main__':
     n = 3
-    train_json = load_json('./dataset/train.json')
+    train_json = load_json('../dataset/train.json')
     sorted_ann = sort_by_image(train_json['annotations'])
     n_data = split_data(train_json['images'], sorted_ann, n=n)
 

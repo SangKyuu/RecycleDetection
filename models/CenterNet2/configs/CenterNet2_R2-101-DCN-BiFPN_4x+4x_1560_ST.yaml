@@ -5,7 +5,7 @@ MODEL:
   BIFPN:
     NUM_BIFPN: 7
     OUT_CHANNELS: 288
-  WEIGHTS: "output/CenterNet2_R2-101-DCN-BiFPN_4x+4x_1560_ST.pth"
+  WEIGHTS:  "output/CenterNet2/CenterNet2_R2-101-DCN-BiFPN_4x+4x_1560_ST/model_final.pth" # "output/CenterNet2_R2-101-DCN-BiFPN_4x+4x_1560_ST.pth"
   RESNETS:
     DEPTH: 101
     WIDTH_PER_GROUP: 26
@@ -27,11 +27,11 @@ SOLVER:
   IMS_PER_BATCH: 8  # 32
 DATASETS:
   TRAIN: "('recycle_train',)"
-  TEST: "('recycle_val',)"
+  TEST: "('recycle_test',)"
   TRAINPATH: "/home/RecycleDetection/dataset/train.json"
-  TESTPATH: "/home/RecycleDetection/dataset/train.json"
+  TESTPATH: "/home/RecycleDetection/dataset/test.json"
 INPUT:
-  FORMAT: RGB
+  FORMAT: BGR
   CUSTOM_AUG: EfficientDetResizeCrop
   TRAIN_SIZE: 640 # 1280
   TEST_SIZE: 640 # 1560

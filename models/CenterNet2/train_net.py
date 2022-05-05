@@ -56,17 +56,26 @@ def preprocess_coco(filepath):
     dir_ = '/home/RecycleDetection/dataset/'
 
     data_dicts = [{} for i in range(len(json_data['images']))]
-    for ann in json_data['annotations']:
-        if not len(data_dicts[ann['image_id']]):
-            data_dicts[ann['image_id']]["file_name"] = dir_ + json_data['images'][ann['image_id']]['file_name']
-            data_dicts[ann['image_id']]["image_id"] = json_data['images'][ann['image_id']]['id']
-            data_dicts[ann['image_id']]["height"] = json_data['images'][ann['image_id']]['height']
-            data_dicts[ann['image_id']]["width"] = json_data['images'][ann['image_id']]['width']
-            ann['bbox_mode'] = BoxMode.XYWH_ABS
-            data_dicts[ann['image_id']]['annotations'] = [ann]
-        else:
-            ann['bbox_mode'] = BoxMode.XYWH_ABS
-            data_dicts[ann['image_id']]['annotations'].append(ann)
+    if len(json_data['annotations']):
+        for ann in json_data['annotations']:
+            if not len(data_dicts[ann['image_id']]):
+                data_dicts[ann['image_id']]["file_name"] = dir_ + json_data['images'][ann['image_id']]['file_name']
+                data_dicts[ann['image_id']]["image_id"] = json_data['images'][ann['image_id']]['id']
+                data_dicts[ann['image_id']]["height"] = json_data['images'][ann['image_id']]['height']
+                data_dicts[ann['image_id']]["width"] = json_data['images'][ann['image_id']]['width']
+                ann['bbox_mode'] = BoxMode.XYWH_ABS
+                data_dicts[ann['image_id']]['annotations'] = [ann]
+            else:
+                ann['bbox_mode'] = BoxMode.XYWH_ABS
+                data_dicts[ann['image_id']]['annotations'].append(ann)
+    else:
+        for img_dict in json_data['images']:
+            data_dicts[img_dict['id']]['file_name'] = dir_ + img_dict['file_name']
+            data_dicts[img_dict['id']]["image_id"] = img_dict['id']
+            data_dicts[img_dict['id']]["height"] = img_dict['height']
+            data_dicts[img_dict['id']]["width"] = img_dict['width']
+            data_dicts[img_dict['id']]['annotations'] = []
+
     return data_dicts
 
 
@@ -277,13 +286,13 @@ Run on multiple machines:
                         metavar="FILE", help="path to config file")
     parser.add_argument(
         "--resume",
-        default=True,
+        default=False,
         action="store_true",
         help="Whether to attempt to resume from the checkpoint directory. "
              "See documentation of `DefaultTrainer.resume_or_load()` for what it means.",
     )
-    parser.add_argument("--eval-only", default=False, action="store_true", help="perform evaluation only")
-    parser.add_argument("--train-only", default=True, action="store_true", help="perform training only")
+    parser.add_argument("--eval-only", default=True, action="store_true", help="perform evaluation only")
+    parser.add_argument("--train-only", default=False, action="store_true", help="perform training only")
 
     parser.add_argument("--num-gpus", type=int, default=2, help="number of gpus *per machine*")
     parser.add_argument("--num-machines", type=int, default=1, help="total number of machines")
