@@ -23,9 +23,10 @@ def ml_nms(boxlist, nms_thresh, max_proposals=-1,
         labels = boxlist.proposal_boxes.tensor.new_zeros(
             len(boxlist.proposal_boxes.tensor))
     scores = boxlist.scores
-    
-    # keep = batched_nms(boxes, scores, labels, nms_thresh)
-    keep = batched_nms(boxes, scores, torch.zeros(len(labels)), nms_thresh)
+    keep = batched_nms(boxes, scores, labels, nms_thresh)
+    # keep = batched_nms(boxes, scores, torch.zeros(len(labels)), nms_thresh)
+    # keep = batched_softnms(boxes, scores, torch.zeros(len(labels)), nms_thresh)
+
     # keep = batched_nms(boxes[keep], scores[keep], torch.zeros(len(keep)), 0.85)
 
     if max_proposals > 0:

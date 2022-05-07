@@ -5,7 +5,7 @@ MODEL:
   BIFPN:
     NUM_BIFPN: 7
     OUT_CHANNELS: 288
-  WEIGHTS:  "output/CenterNet2/CenterNet2_R2-101-DCN-BiFPN_4x+4x_1560_ST/model_final.pth" # "output/CenterNet2_R2-101-DCN-BiFPN_4x+4x_1560_ST.pth"
+  WEIGHTS: "output/CenterNet2/CenterNet2_R2-101-DCN-BiFPN_4x+4x_1560_ST(nms0.5)/model_final.pth" # "output/CenterNet2_R2-101-DCN-BiFPN_4x+4x_1560_ST.pth"
   RESNETS:
     DEPTH: 101
     WIDTH_PER_GROUP: 26
@@ -15,6 +15,9 @@ MODEL:
   PIXEL_STD: [54.77174141, 53.35981744, 54.01141646]  # [58.395, 57.12, 57.375]
   CENTERNET:
     USE_DEFORMABLE: True
+    NMS_TH_TRAIN : 0.5
+    NMS_TH_TEST : 0.5
+    INFERENCE_TH : 0.0001
   ROI_HEADS:
     IN_FEATURES: ["p3", "p4"]
 TEST:

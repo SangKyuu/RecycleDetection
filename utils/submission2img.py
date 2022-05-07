@@ -4,7 +4,7 @@ import json
 import numpy as np
 
 
-with open('../dataset/submission.csv', 'r') as f:
+with open('../dataset/submission_train_test_nms05_c02.csv', 'r') as f:
     rdr = csv.reader(f)
     csv_data = list(rdr)
 
