@@ -3,7 +3,7 @@ FROM nvidia/cuda:10.1-cudnn7-devel
 ENV DEBIAN_FRONTEND noninteractive
 RUN rm /etc/apt/sources.list.d/cuda.list && rm /etc/apt/sources.list.d/nvidia-ml.list
 RUN apt-get update && apt-get install -y \
-	python3-opencv ca-certificates python3-dev git wget sudo ninja-build
+	python3-opencv ca-certificates python3-dev git wget sudo ninja-build zip htop screen libgl1-mesa-glx
 RUN ln -sv /usr/bin/python3 /usr/bin/python
 
 # create a non-root user
@@ -35,6 +35,10 @@ ENV TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST}"
 
 RUN pip install --user -e detectron2_repo
 
+RUN git clone https://github.com/fbcotter/pytorch_wavelets
+WORKDIR /home/appuser/pytorch_wavelets/
+RUN pip install --user .
+
 # Set a fixed model cache directory.
 ENV FVCORE_CACHE="/tmp"
 RUN sudo apt-get update
@@ -43,6 +47,9 @@ ENV LANGUAGE=ko_KR.UTF-8
 ENV LANG=ko_KR.UTF-8
 RUN sudo locale-gen ko_KR ko_KR.UTF-8
 RUN sudo update-locale LANG=ko_KR.UTF-8
+
+RUN pip install seaborn thop ensemble-boxes
+
 WORKDIR /home/RecycleDetection/
 
 # run detectron2 under user "appuser":

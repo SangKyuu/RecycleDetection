@@ -21,7 +21,6 @@ from detectron2.data import build_detection_test_loader
 
 from centernet.config import add_centernet_config
 
-
 # Register Dataset
 try:
     register_coco_instances('coco_trash_test', {}, '../../dataset/test.json', '../../dataset/')
