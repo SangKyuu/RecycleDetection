@@ -79,12 +79,16 @@
 
 ### Ensemble
 #### WBF confidence
+
 |Confidence|mAP50|
+|---|---|
 |0.1|61.50|
 |0.0001|**61.70**|
 
 #### WBF model weights
+
 |CenterNet:YOLOR|mAP50|
+|---|---|
 |1:1|**61.70**|
 |2:1|61.49|
 
