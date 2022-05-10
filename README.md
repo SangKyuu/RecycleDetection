@@ -116,8 +116,8 @@ $ docker-compose run r_centernet2
 (r_centernet2)$ cd /home/RecycleDetection/models/CenterNet2/
 (r_centernet2)$ python train_net.py  # train CenterNet2
 
-(r_centernet2)$ cd /home/RecycleDetection/models/yolor/
-(r_centernet2)$ ! python train.py --batch-size 6 --img 1280 1280 --data data/recycle.yaml --cfg cfg/yolor_p6.cfg --weights '/content/yolor_p6.pt' --device 0 --name yolor_p6 --hyp hyp.finetune.1280.yaml --epochs 30   # triain YOLOR
+(r_centernet2)$ cd /home/RecycleDetection/
+(r_centernet2)$ ! python train.py --batch-size 6 --img 1280 1280 --data models/yolor/data/recycle.yaml --cfg models/yolor/cfg/yolor_p6.cfg --weights 'models/yolor/content/yolor_p6.pt' --device 0 --name yolor_p6 --hyp hyp.finetune.1280.yaml --epochs 30   # triain YOLOR
 ```
 
 - **Infernece**
@@ -127,21 +127,26 @@ $ docker-compose run r_centernet2
 ## 4. Approach
 
 - [EDA](./EDA.ipynb) : 파일 참고
+  - EDA 파일을 통하여 확인하였을 때 class에 대한 imbalance가 컸으므로 focal loss를 사용하는 CenterNet2 모델을 선정하였습니다.
 
 - CeneterNet 모델 성능 개선 방향
-  - 학습시 NMS threshold에 대한 설정 : 기존 trianing  NMS threshold가 0.9로 설정되어 있어 주변의 박스를 못 지우는 경향이 생김 -> threhold 0.7로 설정
-  - prediction confidence값의 설정 : 0.3가 사람 눈에는 제일 좋아 보였으나 놓치는 bbox가 많음으로 0.1로 설정
-  - lr 설정 : 기본값은 0.04로 설정되어 있었지만 GPU 메모리 부족으로 batch size가 줄어듬에 따라 lr 하향 조정 (0.01)
+  - 학습시 NMS threshold에 대한 설정 : 기존 trianing  NMS threshold가 0.9로 설정되어 있어 주변의 박스를 못 지우는 경향이 생김 -> threhold 0.7로 설정하였습니다.
+  - prediction confidence값의 설정 : 0.3가 사람 눈에는 제일 좋아 보였으나 놓치는 bbox가 많음으로 0.1로 설정하였습니다.
+  - lr 설정 : 기본값은 0.04로 설정되어 있었지만 GPU 메모리 부족으로 batch size가 줄어듬에 따라 lr (0.01) 하향 조정하였습니다.
 
 - YOLOR 모델 성능 개선 방향
-
+  - 30 epoch으로 학습 시 train에 대한 데이터가 충분히 학습되지 않음을 확인하였습니다. 따라서 epoch을 50으로 증가시켜 학습을 진행하였습니다.
+  - YOLOR을 학습시킨 기본 이미지 사이즈인 1280이 아닌 1024로 학습하였을 때, 정확도가 낮을것을 판단할 수 있었습니다.
+ 
 - Ensemble 개선 방향
-
+  - 서로 구조가 상이한 모델 2개를 통하여 ensemble하여 정밀도를 올리고자 하였습니다.
+  - ensemble은 각 모델의 prediction값을 wbf을 통하여 후처리 후 최종값을 출력하도록 하였습니다. 이때 각 모델의 비중은 1:1로 설정함으로써 각 모델이 동등하게 예측할 수 있도록 하였습니다. 
+  - 
 - Future work
-  - class에 대한 data imbalance으로 인한 mAP 값 저하 : augumentation을 통한 상대적으로 부족한 class에 대한 데이터 확보 및 학습을 통하여 imbalance 문제 해결
-  - Ensemble 모델 추가
+  - class에 대한 data imbalance으로 인한 mAP 값 저하 : augumentation을 통한 상대적으로 부족한 class에 대한 데이터 확보 및 학습을 통하여 imbalance 문제 해결하였습니다.
+  - Ensemble 모델 추가 (ex Swin-T, 1 stage 계열의 모델)
   - class에 대한 NMS 수정 : 
       ```
       기존 NMS의 경우 예측된 class에 따라 분리하여 각각 class에 대하여 NMS를 실행함으로, 같은 물체를 다른 class로 예측 시 IOU값이 큼에도 불구하고 지워지지 않는 현상 발생 
-      -> IOU가 0.9 이상인 bbox들에 대하여 class에 상관없이 NMS 진행할 수 있도록 코드 수정
+      -> IOU가 0.9 이상인 bbox들에 대하여 class에 상관없이 NMS 진행할 수 있도록 코드 수정하면 성능이 오를것이라 생각합니다.
       ```
