@@ -1,44 +1,96 @@
 # RecycleDetection
 
 ## 1. Summary
-[YOLOR](https://github.com/WongKinYiu/yolor), [CenterNet2](https://github.com/xingyizhou/CenterNet2) 모델의 앙상블을 통하여 모델을 설정하였습니다. 
+
+<p align="center"><img src="https://user-images.githubusercontent.com/41942097/167637173-6780bac2-d183-4550-9571-0078adcdf41d.png" width="730" height="350"></p>
+
+- [YOLOR](https://github.com/WongKinYiu/yolor), [CenterNet2](https://github.com/xingyizhou/CenterNet2) 모델의 앙상블을 통하여 모델을 설정하였습니다. 
 학습된 YOLOR, CenterNet2 모델의 prediction 결과를 WBF(Weighted Box Fusion)를 통하여 후처리하여 최종 결과값을 뽑을 수 있도록 하였습니다.
+(다른 결과를 추론하기 위하여 1 stage Detector, 2 stage Detector 각각 선택)
 
-YOLOR 및 CetnerNet2의 경우 [COCO dataset Leaderboard](https://paperswithcode.com/sota/object-detection-on-coco) 의 결과를 참고하여 선정하였습니다. 
+### Training Elements
 
-- Ensemble을 위하여 2stage 모델과 1stage 모델 하나씩 선택
-
-<br>
-
-![image](https://user-images.githubusercontent.com/41942097/167284365-d45ad66b-2caa-4dd0-a891-f2b280e7abe4.png)
-
-![image](https://user-images.githubusercontent.com/41942097/167284356-82b91ac9-ef04-4daa-bef2-8c19c7210aef.png)
+#### CenterNet2
+|Learning Rate|Augumentation|Train NMS threshold|Imgae Size(train)|Imgae Size(test)|epoch|
+|---|---|---|---|---|---|
+|0.01|crop, brightness, contrast|0.7|(640,640)|(640,640)|30|
 
 <br>
 
-- 각 모델은 따로따로 학습하여 각각 모델이 최고 성능을 갖는 파라미터를 찾을 수 있도록 하였습니다.
+#### YOLOR
+|Learning Rate|Augumentation|Train NMS threshold|Imgae Size(train)|Imgae Size(test)|epoch|
+|---|---|---|---|---|---|
+|0.01|flip, mosaic|0.5|(1024,1024)|(1024,1024)|50|
 
 <br><br>
 
 ## 2. Experimetal results
 
 ### CenterNet2
-- 기본 parameters : 
+
 #### train NMS threshold
-#### test NMS threshold
+(초기 학습 결과를 확인하였을 때 NMS 처리에 따른 지워지지 않는 box들의 존재를 확인하고 th를 조정해보았습니다.)
+
+|Training NMS th|Test NMS th|mAP50|
+|---|---|---|
+|0.9|0.9|55.54|
+|0.7|0.7|58.75|
+|0.7|0.5|**59.67**|
+|0.5|0.5|56.35|
+
 #### confidence threshold
+(confidence가 높을수록 사람 눈에는 더욱 좋은 결과로 느껴졌지만, Precision 결과상으로는 낮으수록 더 많은 box들이 남아 더 좋은 결과를 보였습니다.)
+|Confidence th|mAP50|
+|---|---|
+|0.3|54.98|
+|0.2|57.15|
+|0.1|**58.75**|
+
+
 #### augumentation
+|Train|Test|mAP50|
+|---|---|---|
+|A type|None|55.54|
+|B type|B type|51.27|
+|A type|None|**57.10**|
+
+- A type: Random Crop
+- B type: Random Crop, Random Brightness, Random Contrast
+
+-> 학습에만 augmentation을 진행하는 것이 최고로 좋은 결과를 보였습니다. 
 
 <br>
 
 ### YOLOR
-- 기본 parameters :
-#### 
+
+#### Image size
+|Imgae size| mAP50|
+|1024|52.67|
+|1280|**54.28**|
+
+#### Confidence
+|Confidence|mAP50|
+|0.1|52.67|
+|0.05|**54.28**|
+
+-> YOLOR의 경우 epoch 30으로는 부족하여 50으로 증가했을 때 mAP50 57.58 기존 54.28보다 크게 증가하였습니다.
 
 <br>
 
 ### Ensemble
-####
+#### WBF confidence
+|Confidence|mAP50|
+|0.1|61.50|
+|0.0001|**61.70**|
+
+#### WBF model weights
+|CenterNet:YOLOR|mAP50|
+|1:1|**61.70**|
+|2:1|61.49|
+
+-> WBF의 경우 CenterNet2 와 YOLOR의 가중치를 동일하게 설정하는 것이 좋은 성능을 보였고, wbf를 통하여 Ensemble을 진행함으로써 CenterNet2의 최고 점수인 59.67를 넘을 수 있었습니다. 
+- WBF의 경우 모델의 구조가 다를수록 효과가 크다는 것을 논문을 통하여 확인하고, 2 stage Detector인 CenterNet2 와 1 stage Detector인 YOLOR을 선택하여 진행하였습니다.
+
 
 <br><br>
 
