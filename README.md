@@ -26,7 +26,7 @@
 
 ## 2. Experimetal results
 
-### CenterNet2
+### A. CenterNet2
 
 #### train NMS threshold
 (초기 학습 결과를 확인하였을 때 NMS 처리에 따른 지워지지 않는 box들의 존재를 확인하고 th를 조정해보았습니다.)
@@ -61,7 +61,7 @@
 
 <br>
 
-### YOLOR
+### B. YOLOR
 
 #### Image size
 |Imgae size| mAP50|
@@ -79,7 +79,7 @@
 
 <br>
 
-### Ensemble
+### C. Ensemble
 #### WBF confidence
 
 |Confidence|mAP50|
