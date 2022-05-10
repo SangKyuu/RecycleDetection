@@ -1,4 +1,4 @@
-# RecycleDetection
+# 재활용 품목 분류를 위한 Object Detection
 
 ## 1. Summary
 
@@ -124,6 +124,9 @@ $ docker-compose run r_centernet2
 ```
 (r_centernet2)$ python Inference_Ensemble.py
 ```
+
+<br><br>
+
 ## 4. Approach
 
 - [EDA](./EDA.ipynb) : 파일 참고
