@@ -117,7 +117,7 @@ $ docker-compose run r_centernet2
 (r_centernet2)$ python train_net.py  # train CenterNet2
 
 (r_centernet2)$ cd /home/RecycleDetection/
-(r_centernet2)$ ! python train.py --batch-size 6 --img 1280 1280 --data models/yolor/data/recycle.yaml --cfg models/yolor/cfg/yolor_p6.cfg --weights 'models/yolor/content/yolor_p6.pt' --device 0 --name yolor_p6 --hyp hyp.finetune.1280.yaml --epochs 30   # triain YOLOR
+(r_centernet2)$ python train.py --batch-size 6 --img 1280 1280 --data models/yolor/data/recycle.yaml --cfg models/yolor/cfg/yolor_p6.cfg --weights 'models/yolor/content/yolor_p6.pt' --device 0 --name yolor_p6 --hyp hyp.finetune.1280.yaml --epochs 30   # triain YOLOR
 ```
 
 - **Infernece**
