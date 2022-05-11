@@ -38,6 +38,10 @@
 |0.7|0.5|**59.67**|
 |0.5|0.5|56.35|
 
+#### Soft-NMS
+- Soft-NMS로 NMS를 교체하였을 때, mAP50이 32.80으로 현저히 낮은 성능을 보였습니다.
+
+
 #### confidence threshold
 (confidence가 높을수록 사람 눈에는 더욱 좋은 결과로 느껴졌지만, Precision 결과상으로는 낮으수록 더 많은 box들이 남아 더 좋은 결과를 보였습니다.)
 |Confidence th|mAP50|
