@@ -101,28 +101,49 @@
 <br><br>
 
 ## 3. Instructions
+- git clone
+```
+$ git clone https://github.com/SangKyuu/RecycleDetection/
+```
+
+- dataset 다운로드 
+```
+$cd ./RecycleDetection/
+$ wget https://aistages-prod-server-public.s3.amazonaws.com/app/Competitions/000086/data/data.tar.gz
+$ tar -xvf data.tar.gz
+```
+
+- 학습된 model Weight 다운로드
+```
+$ wget https://drive.google.com/file/d/1-fAVUb7CWd-DaP4ijMerZjNCLVlN8ZYi/view?usp=sharing  # CenterNet weight (finetuned)
+$ wget https://drive.google.com/file/d/1iL1tB7h1s_PcXwvbBd-ETvaAjJRm-6nc/view?usp=sharing  # YOLOR weight (finetuned)
+$ mv YOLOR_recycle_fintuned.pt RecycleDetection/models/yolor/YOLOR_recycle_fintuned.pt
+$ mv CenterNet2_recycle_finetuned.pth RecycleDetection/models/CenterNet2/CenterNet2_recycle_finetuned.pth
+```
 
 - **docker** 환경구성
 - /RecycleDetection/models/CenterNet2/docker/ 폴더 내의 파일로 docker 환경 구성
 
 ```
 # 아래의 코드 실행
+$ cd RecycleDetection/models/CenterNet2/docker/
 $ docker-compose build r_centernet2
 $ docker-compose run r_centernet2
 ```
 
 - **Train**
 ```
+# inside docker container
 (r_centernet2)$ cd /home/RecycleDetection/models/CenterNet2/
 (r_centernet2)$ python train_net.py  # train CenterNet2
 
 (r_centernet2)$ cd /home/RecycleDetection/
-(r_centernet2)$ python train.py --batch-size 6 --img 1280 1280 --data models/yolor/data/recycle.yaml --cfg models/yolor/cfg/yolor_p6.cfg --weights 'models/yolor/content/yolor_p6.pt' --device 0 --name yolor_p6 --hyp hyp.finetune.1280.yaml --epochs 30   # triain YOLOR
+(r_centernet2)$ python train.py --batch-size 6 --img 1280 1280 --data models/yolor/data/recycle.yaml --cfg models/yolor/cfg/yolor_p6.cfg --weights 'models/yolor/content/yolor_p6.pt' --device 0 --name yolor_p6 --hyp models/yolor/data/hyp.finetune.1280.yaml --epochs 50   # triain YOLOR
 ```
 
 - **Infernece**
 ```
-(r_centernet2)$ python Inference_Ensemble.py
+(r_centernet2)$ python inference_ensemble.py
 ```
 
 <br><br>
