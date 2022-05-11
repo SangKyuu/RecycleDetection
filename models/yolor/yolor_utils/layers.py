@@ -1,6 +1,6 @@
 import torch.nn.functional as F
 
-from utils.general import *
+from .general import *
 
 import torch
 from torch import nn

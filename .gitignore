@@ -9,6 +9,7 @@ __pycache__/
 # Datasets and weights
 dataset/
 *.pth
+*.pt
 *.pkl
 *.npy
 *.ts

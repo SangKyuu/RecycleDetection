@@ -9,14 +9,14 @@ import torch
 import yaml
 from tqdm import tqdm
 
-from utils.google_utils import attempt_load
-from utils.datasets import create_dataloader
-from utils.general import coco80_to_coco91_class, check_dataset, check_file, check_img_size, box_iou, \
+from yolor_utils.google_utils import attempt_load
+from yolor_utils.datasets import create_dataloader
+from yolor_utils.general import coco80_to_coco91_class, check_dataset, check_file, check_img_size, box_iou, \
     non_max_suppression, scale_coords, xyxy2xywh, xywh2xyxy, clip_coords, set_logging, increment_path
-from utils.loss import compute_loss
-from utils.metrics import ap_per_class
-from utils.plots import plot_images, output_to_target
-from utils.torch_utils import select_device, time_synchronized
+from yolor_utils.loss import compute_loss
+from yolor_utils.metrics import ap_per_class
+from yolor_utils.plots import plot_images, output_to_target
+from yolor_utils.torch_utils import select_device, time_synchronized
 
 from models.models import *
 
@@ -341,4 +341,4 @@ if __name__ == '__main__':
                 y.append(r + t)  # results and times
             np.savetxt(f, y, fmt='%10.4g')  # save
         os.system('zip -r study.zip study_*.txt')
-        # utils.general.plot_study_txt(f, x)  # plot
+        # yolor_utils.general.plot_study_txt(f, x)  # plot

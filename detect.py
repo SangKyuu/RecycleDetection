@@ -4,22 +4,23 @@ import platform
 import shutil
 import time
 from pathlib import Path
-
+import pandas as pd
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
 from numpy import random
 
-from utils.google_utils import attempt_load
-from utils.datasets import LoadStreams, LoadImages
-from utils.general import (
+from models.yolor.yolor_utils.google_utils import attempt_load
+from models.yolor.yolor_utils.datasets import LoadStreams, LoadImages
+from models.yolor.yolor_utils.general import (
     check_img_size, non_max_suppression, apply_classifier, scale_coords, xyxy2xywh, strip_optimizer)
-from utils.plots import plot_one_box
-from utils.torch_utils import select_device, load_classifier, time_synchronized
+from models.yolor.yolor_utils.plots import plot_one_box
+from models.yolor.yolor_utils.torch_utils import select_device, load_classifier, time_synchronized
 
-from models.models import *
-from utils.datasets import *
-from utils.general import *
+from models.yolor.models.models import *
+from models.yolor.yolor_utils.datasets import \
+    *
+from models.yolor.yolor_utils.general import *
 
 def load_classes(path):
     # Loads *.names file at 'path'
@@ -41,7 +42,7 @@ def detect(save_img=False):
 
     # Load model
     model = Darknet(cfg, imgsz).cuda()
-    model.load_state_dict(torch.load(weights[0], map_location=device)['model'])
+    model.load_state_dict(torch.load(weights, map_location=device)['model'])
     #model = attempt_load(weights, map_location=device)  # load FP32 model
     #imgsz = check_img_size(imgsz, s=model.stride.max())  # check img_size
     model.to(device).eval()
@@ -73,6 +74,10 @@ def detect(save_img=False):
     t0 = time.time()
     img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
     _ = model(img.half() if half else img) if device.type != 'cpu' else None  # run once
+
+    prediction_strings = []
+    file_names = []
+
     for path, img, im0s, vid_cap in dataset:
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
@@ -87,10 +92,7 @@ def detect(save_img=False):
         # Apply NMS
         pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres, classes=opt.classes, agnostic=opt.agnostic_nms)
         t2 = time_synchronized()
-
-        # Apply Classifier
-        if classify:
-            pred = apply_classifier(pred, modelc, img, im0s)
+        prediction_string = ''
 
         # Process detections
         for i, det in enumerate(pred):  # detections per image
@@ -112,68 +114,43 @@ def detect(save_img=False):
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += '%g %ss, ' % (n, names[int(c)])  # add to string
 
+
                 # Write results
+
                 for *xyxy, conf, cls in det:
-                    if save_txt:  # Write to file
-                        xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                        with open(txt_path + '.txt', 'a') as f:
-                            f.write(('%g ' * 5 + '\n') % (cls, *xywh))  # label format
+                    xyxy = torch.tensor(xyxy).view(1, 4).view(-1).cpu().tolist()
+                    prediction_string += (str(int(cls.cpu().item())) + ' ' + str(conf.cpu().item()) + ' ' + str(xyxy[0]) + ' '
+                                  + str(xyxy[1]) + ' ' + str(xyxy[2]) + ' ' + str(xyxy[3]) + ' ')
 
-                    if save_img or view_img:  # Add bbox to image
-                        label = '%s %.2f' % (names[int(cls)], conf)
-                        plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=3)
+        prediction_strings.append(prediction_string)
+        file_names.append(os.path.join(*path.split('/')[-2:]))
 
-            # Print time (inference + NMS)
-            print('%sDone. (%.3fs)' % (s, t2 - t1))
-
-            # Stream results
-            if view_img:
-                cv2.imshow(p, im0)
-                if cv2.waitKey(1) == ord('q'):  # q to quit
-                    raise StopIteration
-
-            # Save results (image with detections)
-            if save_img:
-                if dataset.mode == 'images':
-                    cv2.imwrite(save_path, im0)
-                else:
-                    if vid_path != save_path:  # new video
-                        vid_path = save_path
-                        if isinstance(vid_writer, cv2.VideoWriter):
-                            vid_writer.release()  # release previous video writer
-
-                        fourcc = 'mp4v'  # output video codec
-                        fps = vid_cap.get(cv2.CAP_PROP_FPS)
-                        w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                        h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                        vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*fourcc), fps, (w, h))
-                    vid_writer.write(im0)
-
-    if save_txt or save_img:
-        print('Results saved to %s' % Path(out))
-        if platform == 'darwin' and not opt.update:  # MacOS
-            os.system('open ' + save_path)
+    submission = pd.DataFrame()
+    submission['PredictionString'] = prediction_strings
+    submission['image_id'] = file_names
+    submission.to_csv('dataset/submission_yolor_e_50.csv', index=None)
+    submission.head()
 
     print('Done. (%.3fs)' % (time.time() - t0))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default='yolor_p6.pt', help='model.pt path(s)')
-    parser.add_argument('--source', type=str, default='inference/images', help='source')  # file/folder, 0 for webcam
-    parser.add_argument('--output', type=str, default='inference/output', help='output folder')  # output folder
+    parser.add_argument('--weights', nargs='+', type=str, default='models/yolor/last.pt', help='model.pt path(s)')
+    parser.add_argument('--source', type=str, default='dataset/test/', help='source')  # file/folder, 0 for webcam
+    parser.add_argument('--output', type=str, default='dataset/output', help='output folder')  # output folder
     parser.add_argument('--img-size', type=int, default=1280, help='inference size (pixels)')
-    parser.add_argument('--conf-thres', type=float, default=0.4, help='object confidence threshold')
+    parser.add_argument('--conf-thres', type=float, default=0.05, help='object confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.5, help='IOU threshold for NMS')
-    parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
+    parser.add_argument('--device', default='0,1', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--view-img', action='store_true', help='display results')
     parser.add_argument('--save-txt', action='store_true', help='save results to *.txt')
     parser.add_argument('--classes', nargs='+', type=int, help='filter by class: --class 0, or --class 0 2 3')
     parser.add_argument('--agnostic-nms', action='store_true', help='class-agnostic NMS')
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     parser.add_argument('--update', action='store_true', help='update all models')
-    parser.add_argument('--cfg', type=str, default='cfg/yolor_p6.cfg', help='*.cfg path')
-    parser.add_argument('--names', type=str, default='data/coco.names', help='*.cfg path')
+    parser.add_argument('--cfg', type=str, default='models/yolor/cfg/yolor_p6.cfg', help='*.cfg path')
+    parser.add_argument('--names', type=str, default='models/yolor/data/recycle.names', help='*.cfg path')
     opt = parser.parse_args()
     print(opt)
 

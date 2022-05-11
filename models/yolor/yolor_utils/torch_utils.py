@@ -1,4 +1,4 @@
-# PyTorch utils
+# PyTorch yolor_utils
 
 import logging
 import math

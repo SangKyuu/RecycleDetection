@@ -1,4 +1,4 @@
-# Dataset utils and dataloaders
+# Dataset yolor_utils and dataloaders
 
 import glob
 import math
@@ -23,8 +23,8 @@ from copy import deepcopy
 from pycocotools import mask as maskUtils
 from torchvision.utils import save_image
 
-from utils.general import xyxy2xywh, xywh2xyxy
-from utils.torch_utils import torch_distributed_zero_first
+from .general import xyxy2xywh, xywh2xyxy
+from .torch_utils import torch_distributed_zero_first
 
 # Parameters
 help_url = 'https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data'
@@ -79,7 +79,7 @@ def create_dataloader(path, imgsz, batch_size, stride, opt, hyp=None, augment=Fa
                                     num_workers=nw,
                                     sampler=sampler,
                                     pin_memory=True,
-                                    collate_fn=LoadImagesAndLabels.collate_fn)  # torch.utils.data.DataLoader()
+                                    collate_fn=LoadImagesAndLabels.collate_fn)  # torch.yolor_utils.data.DataLoader()
     return dataloader, dataset
 
 
@@ -105,7 +105,7 @@ def create_dataloader9(path, imgsz, batch_size, stride, opt, hyp=None, augment=F
                                     num_workers=nw,
                                     sampler=sampler,
                                     pin_memory=True,
-                                    collate_fn=LoadImagesAndLabels9.collate_fn)  # torch.utils.data.DataLoader()
+                                    collate_fn=LoadImagesAndLabels9.collate_fn)  # torch.yolor_utils.data.DataLoader()
     return dataloader, dataset
 
 
