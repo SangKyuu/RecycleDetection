@@ -62,7 +62,7 @@ def build_centernet2(cfg_path):
 
 def build_yolor():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default='models/yolor/last.pt', help='model.pt path(s)')
+    parser.add_argument('--weights', nargs='+', type=str, default='models/yolor/YOLOR_recycle_fintuned.pt', help='model.pt path(s)')
     parser.add_argument('--source', type=str, default='dataset/test/', help='source')  # file/folder, 0 for webcam
     parser.add_argument('--output', type=str, default='output/', help='output folder')  # output folder
     parser.add_argument('--img-size', type=int, default=1024, help='inference size (pixels)')
@@ -76,7 +76,7 @@ def build_yolor():
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     parser.add_argument('--update', action='store_true', help='update all models')
     parser.add_argument('--cfg', type=str, default='models/yolor/cfg/yolor_p6.cfg', help='*.cfg path')
-    parser.add_argument('--names', type=str, default='models/yolor/data/coco.names', help='*.cfg path')
+    parser.add_argument('--names', type=str, default='models/yolor/data/recycle.names', help='*.cfg path')
     opt = parser.parse_args()
     print(opt)
 
